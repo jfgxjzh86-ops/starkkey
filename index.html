@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stark Key System</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{min-height:100vh;display:flex;justify-content:center;align-items:center;background:radial-gradient(circle at top,#3b0a0a,transparent 40%),#080808;color:white}
+.container{width:92%;max-width:430px;padding:30px;border:1px solid #ff3030;border-radius:22px;background:rgba(20,20,20,.92);box-shadow:0 0 35px rgba(255,0,0,.25);text-align:center}
+.logo{width:70px;height:70px;margin:auto;border-radius:18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ff3030,#850000);font-size:28px;font-weight:bold}
+h1{margin-top:18px;font-size:27px}.subtitle{margin-top:8px;color:#aaa;font-size:14px}
+.card{margin-top:25px;padding:20px;border-radius:16px;background:#111;border:1px solid #292929}
+.key-box{margin-top:15px;padding:14px;border-radius:10px;background:#080808;border:1px dashed #ff3030;color:#ff5555;font-size:15px;word-break:break-all;min-height:48px}
+button{width:100%;margin-top:15px;padding:14px;border:none;border-radius:11px;cursor:pointer;font-size:15px;font-weight:bold;color:white;background:linear-gradient(135deg,#ff3030,#a00000)}
+button:disabled{opacity:.5;cursor:not-allowed}.timer{margin-top:16px;color:#aaa;font-size:13px}.timer span{color:#ff4444;font-weight:bold}.status{margin-top:15px;font-size:13px;color:#777}.footer{margin-top:20px;color:#555;font-size:11px}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="logo">S</div><h1>STARK KEY SYSTEM</h1><p class="subtitle">ระบบรับคีย์อัตโนมัติ</p>
+<div class="card">
+<div>🔑 คีย์ของคุณ</div>
+<div id="keyBox" class="key-box">กดปุ่มด้านล่างเพื่อรับคีย์</div>
+<button id="getKey">🎁 รับคีย์</button>
+<button id="copyKey" disabled>📋 คัดลอกคีย์</button>
+<div class="timer">สถานะคีย์: <span id="timer">ยังไม่มีคีย์</span></div>
+<div id="status" class="status">พร้อมรับคีย์</div>
+</div>
+<div class="footer">Stark Key System • Automatic Key Generator</div>
+</div>
+<script>
+const keyBox=document.getElementById("keyBox"),getKey=document.getElementById("getKey"),copyKey=document.getElementById("copyKey"),timer=document.getElementById("timer"),statusText=document.getElementById("status");
+let currentKey=null,expireTime=null,timerInterval=null;
+function generateKey(){const c="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";let p=n=>{let r="";for(let i=0;i<n;i++)r+=c[Math.floor(Math.random()*c.length)];return r};return"STARK-"+p(5)+"-"+p(5)+"-"+p(5)}
+function updateTimer(){if(!expireTime)return;const r=expireTime-Date.now();if(r<=0){clearInterval(timerInterval);currentKey=null;expireTime=null;keyBox.textContent="คีย์หมดอายุแล้ว";timer.textContent="หมดอายุ";statusText.textContent="สามารถรับคีย์ใหม่ได้";copyKey.disabled=true;getKey.disabled=false;return}const h=Math.floor(r/3600000),m=Math.floor(r%3600000/60000),s=Math.floor(r%60000/1000);timer.textContent=`${h}ชม. ${m}น. ${s}วิ.`}
+getKey.onclick=()=>{currentKey=generateKey();expireTime=Date.now()+86400000;keyBox.textContent=currentKey;statusText.textContent="สร้างคีย์สำเร็จ ✓";copyKey.disabled=false;getKey.disabled=true;clearInterval(timerInterval);timerInterval=setInterval(updateTimer,1000);updateTimer()};
+copyKey.onclick=async()=>{if(!currentKey)return;try{await navigator.clipboard.writeText(currentKey);statusText.textContent="คัดลอกคีย์แล้ว ✓";setTimeout(()=>statusText.textContent="คีย์พร้อมใช้งาน",2000)}catch{statusText.textContent="ไม่สามารถคัดลอกอัตโนมัติได้"}};
+</script>
+</body>
+</html>
